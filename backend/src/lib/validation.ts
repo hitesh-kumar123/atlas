@@ -1,16 +1,16 @@
 import { z } from "zod";
 
 export const signupSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(10, "Password must be at least 10 characters"),
-  name: z.string().min(1).max(120),
-  orgName: z.string().min(1).max(120),
+  email: z.string().email("Please enter a valid work email address"),
+  password: z.string().min(8, "Password must be at least 8 characters long"),
+  name: z.string().trim().min(3, "Full name must be at least 3 characters").max(120),
+  orgName: z.string().trim().min(3, "Organisation name must be at least 3 characters").max(120),
 });
 export type SignupInput = z.infer<typeof signupSchema>;
 
 export const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(1),
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(8, "Password must be at least 8 characters long"),
 });
 export type LoginInput = z.infer<typeof loginSchema>;
 
