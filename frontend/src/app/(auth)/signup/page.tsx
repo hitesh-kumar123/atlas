@@ -15,12 +15,12 @@ export default function SignupPage() {
   const [error, setError] = useState<string | null>(null);
 
   const validateForm = (): boolean => {
-    if (!name.trim() || name.trim().length < 2) {
-      setError("Full name must be at least 2 characters long.");
+    if (!name.trim() || name.trim().length < 3) {
+      setError("Full name must be at least 3 characters long.");
       return false;
     }
-    if (!orgName.trim() || orgName.trim().length < 2) {
-      setError("Organisation name must be at least 2 characters long.");
+    if (!orgName.trim() || orgName.trim().length < 3) {
+      setError("Organisation name must be at least 3 characters long.");
       return false;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -28,8 +28,8 @@ export default function SignupPage() {
       setError("Please enter a valid work email address.");
       return false;
     }
-    if (!password || password.length < 10) {
-      setError("Password must be at least 10 characters long.");
+    if (!password || password.length < 8) {
+      setError("Password must be at least 8 characters long.");
       return false;
     }
     return true;
@@ -206,9 +206,9 @@ export default function SignupPage() {
             <input
               type="password"
               required
-              minLength={10}
+              minLength={8}
               className="input-premium"
-              placeholder="At least 10 characters"
+              placeholder="At least 8 characters"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />

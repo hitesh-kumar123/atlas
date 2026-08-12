@@ -18,8 +18,8 @@ export default function LoginPage() {
       setError("Please enter a valid email address.");
       return false;
     }
-    if (!password || password.length < 6) {
-      setError("Password must be at least 6 characters long.");
+    if (!password || password.length < 8) {
+      setError("Password must be at least 8 characters long.");
       return false;
     }
     return true;
