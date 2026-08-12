@@ -14,26 +14,57 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const validateForm = (): boolean => {
+    if (!name.trim() || name.trim().length < 2) {
+      setError("Full name must be at least 2 characters long.");
+      return false;
+    }
+    if (!orgName.trim() || orgName.trim().length < 2) {
+      setError("Organisation name must be at least 2 characters long.");
+      return false;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError("Please enter a valid work email address.");
+      return false;
+    }
+    if (!password || password.length < 10) {
+      setError("Password must be at least 10 characters long.");
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError(null);
 
+    // Client-side validation check
+    if (!validateForm()) {
+      return;
+    }
+
+    setLoading(true);
+
     try {
-      const res = await fetch("http://localhost:4000/api/v1/signup", {
+      const res = await fetch("http://localhost:4000/api/v1/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password, orgName }),
       });
 
-      if (res.ok) {
-        router.push("/login?signup=success");
-      } else {
-        router.push("/overview");
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error ?? "Failed to create tenant account.");
+        setLoading(false);
+        return;
       }
+
+      // Successful validation & account creation
+      router.push("/login?signup=success");
     } catch {
-      router.push("/overview");
-    } finally {
+      setError("Unable to connect to registration server. Please try again.");
       setLoading(false);
     }
   };
@@ -77,6 +108,7 @@ export default function SignupPage() {
               border: "1px solid var(--accent-terra)",
               color: "var(--accent-terra)",
               fontSize: "0.85rem",
+              fontWeight: 500,
               marginBottom: "1.5rem",
             }}
           >
@@ -188,7 +220,7 @@ export default function SignupPage() {
             className="btn-primary"
             style={{ width: "100%", justifyContent: "center", padding: "0.8rem", marginTop: "0.5rem" }}
           >
-            {loading ? "Creating Account..." : "Create Tenant & Account →"}
+            {loading ? "Validating & Creating..." : "Create Tenant & Account →"}
           </button>
         </form>
 

@@ -12,26 +12,49 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const validateForm = (): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError("Please enter a valid email address.");
+      return false;
+    }
+    if (!password || password.length < 6) {
+      setError("Password must be at least 6 characters long.");
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError(null);
 
+    // Client-side validation check
+    if (!validateForm()) {
+      return;
+    }
+
+    setLoading(true);
+
     try {
-      const res = await fetch("http://localhost:4000/api/auth/callback/credentials", {
+      const res = await fetch("http://localhost:4000/api/v1/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
-      if (res.ok) {
-        router.push("/overview");
-      } else {
-        router.push("/overview");
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error ?? "Invalid email or password combination.");
+        setLoading(false);
+        return;
       }
-    } catch {
+
+      // Successful validation & authentication
       router.push("/overview");
-    } finally {
+    } catch {
+      setError("Unable to connect to authentication server. Please try again.");
       setLoading(false);
     }
   };
@@ -75,6 +98,7 @@ export default function LoginPage() {
               border: "1px solid var(--accent-terra)",
               color: "var(--accent-terra)",
               fontSize: "0.85rem",
+              fontWeight: 500,
               marginBottom: "1.5rem",
             }}
           >
@@ -137,7 +161,7 @@ export default function LoginPage() {
             className="btn-primary"
             style={{ width: "100%", justifyContent: "center", padding: "0.8rem", marginTop: "0.5rem" }}
           >
-            {loading ? "Signing In..." : "Sign In →"}
+            {loading ? "Verifying Credentials..." : "Sign In →"}
           </button>
         </form>
 
