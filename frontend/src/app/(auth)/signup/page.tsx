@@ -46,54 +46,55 @@ export default function SignupPage() {
         alignItems: "center",
         justifyContent: "center",
         padding: "2rem",
-        background: "radial-gradient(circle at 50% 30%, #1a1a2e 0%, #0a0a12 70%)",
+        background: "var(--bg-stone)",
       }}
     >
       <div
-        className="glass-card"
+        className="card-premium"
         style={{
           width: "100%",
           maxWidth: "460px",
-          padding: "2.5rem",
-          boxShadow: "0 0 40px rgba(0, 255, 204, 0.15)",
+          padding: "2.75rem",
+          boxShadow: "var(--shadow-lg)",
         }}
       >
-        <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-          <LumenLogo size="lg" />
-          <h2 style={{ fontSize: "1.4rem", marginTop: "1rem", color: "#e8e0f0" }}>
+        <div style={{ textAlign: "center", marginBottom: "2.25rem" }}>
+          <LumenLogo size="lg" href="/" />
+          <h2 style={{ fontSize: "1.5rem", marginTop: "1.25rem", color: "var(--text-dark)" }}>
             Create Tenant Account
           </h2>
-          <p style={{ color: "#a098b0", fontSize: "0.9rem", marginTop: "0.25rem" }}>
-            Start analyzing your product events in minutes
+          <p style={{ color: "var(--text-muted)", fontSize: "0.9rem", marginTop: "0.3rem" }}>
+            Start analyzing product analytics in minutes
           </p>
         </div>
 
         {error && (
           <div
             style={{
-              padding: "0.75rem",
-              borderRadius: "6px",
-              background: "rgba(255, 68, 68, 0.15)",
-              border: "1px solid #ff4444",
-              color: "#ffa0a0",
+              padding: "0.75rem 1rem",
+              borderRadius: "8px",
+              background: "var(--accent-terra-bg)",
+              border: "1px solid var(--accent-terra)",
+              color: "var(--accent-terra)",
               fontSize: "0.85rem",
-              marginBottom: "1.25rem",
+              marginBottom: "1.5rem",
             }}
           >
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.1rem" }}>
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.2rem" }}>
           <div>
             <label
               style={{
                 display: "block",
                 fontSize: "0.8rem",
-                color: "#a098b0",
+                color: "var(--text-muted)",
                 textTransform: "uppercase",
                 fontFamily: "'Space Grotesk', monospace",
-                marginBottom: "0.3rem",
+                fontWeight: 600,
+                marginBottom: "0.35rem",
               }}
             >
               Full Name
@@ -101,7 +102,7 @@ export default function SignupPage() {
             <input
               type="text"
               required
-              className="input-dark"
+              className="input-premium"
               placeholder="Alex Smith"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -113,10 +114,11 @@ export default function SignupPage() {
               style={{
                 display: "block",
                 fontSize: "0.8rem",
-                color: "#a098b0",
+                color: "var(--text-muted)",
                 textTransform: "uppercase",
                 fontFamily: "'Space Grotesk', monospace",
-                marginBottom: "0.3rem",
+                fontWeight: 600,
+                marginBottom: "0.35rem",
               }}
             >
               Organisation Name
@@ -124,7 +126,7 @@ export default function SignupPage() {
             <input
               type="text"
               required
-              className="input-dark"
+              className="input-premium"
               placeholder="Acme Corp"
               value={orgName}
               onChange={(e) => setOrgName(e.target.value)}
@@ -136,10 +138,11 @@ export default function SignupPage() {
               style={{
                 display: "block",
                 fontSize: "0.8rem",
-                color: "#a098b0",
+                color: "var(--text-muted)",
                 textTransform: "uppercase",
                 fontFamily: "'Space Grotesk', monospace",
-                marginBottom: "0.3rem",
+                fontWeight: 600,
+                marginBottom: "0.35rem",
               }}
             >
               Work Email
@@ -147,7 +150,7 @@ export default function SignupPage() {
             <input
               type="email"
               required
-              className="input-dark"
+              className="input-premium"
               placeholder="alex@acme.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -159,10 +162,11 @@ export default function SignupPage() {
               style={{
                 display: "block",
                 fontSize: "0.8rem",
-                color: "#a098b0",
+                color: "var(--text-muted)",
                 textTransform: "uppercase",
                 fontFamily: "'Space Grotesk', monospace",
-                marginBottom: "0.3rem",
+                fontWeight: 600,
+                marginBottom: "0.35rem",
               }}
             >
               Password
@@ -171,7 +175,7 @@ export default function SignupPage() {
               type="password"
               required
               minLength={10}
-              className="input-dark"
+              className="input-premium"
               placeholder="At least 10 characters"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -181,8 +185,8 @@ export default function SignupPage() {
           <button
             type="submit"
             disabled={loading}
-            className="btn-neon-cyan"
-            style={{ width: "100%", marginTop: "0.5rem" }}
+            className="btn-primary"
+            style={{ width: "100%", justifyContent: "center", padding: "0.8rem", marginTop: "0.5rem" }}
           >
             {loading ? "Creating Account..." : "Create Tenant & Account →"}
           </button>
@@ -190,14 +194,14 @@ export default function SignupPage() {
 
         <div
           style={{
-            marginTop: "1.75rem",
+            marginTop: "2rem",
             textAlign: "center",
-            fontSize: "0.85rem",
-            color: "#a098b0",
+            fontSize: "0.9rem",
+            color: "var(--text-muted)",
           }}
         >
           Already registered?{" "}
-          <Link href="/login" style={{ color: "#ff2d78", textDecoration: "none", fontWeight: 600 }}>
+          <Link href="/login" style={{ color: "var(--accent-dark)", textDecoration: "underline", fontWeight: 600 }}>
             Sign In here
           </Link>
         </div>

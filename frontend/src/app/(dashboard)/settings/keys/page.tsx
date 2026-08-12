@@ -23,7 +23,7 @@ export default function ApiKeysPage() {
     },
     {
       id: "key_2",
-      name: "Staging Ingestion",
+      name: "Staging Ingestion Engine",
       keyPrefix: "atlas_live_3c4d5e6",
       lastUsedAt: null,
       createdAt: "2026-08-05T12:30:00Z",
@@ -58,12 +58,12 @@ export default function ApiKeysPage() {
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem", maxWidth: "1000px" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "1.75rem", maxWidth: "1000px" }}>
       {/* Header */}
-      <div className="glass-card" style={{ padding: "1.5rem" }}>
-        <h2 style={{ fontSize: "1.3rem", color: "#e8e0f0" }}>API Key Management</h2>
-        <p style={{ color: "#a098b0", fontSize: "0.85rem", marginTop: "0.2rem" }}>
-          Issue and manage ingestion tokens for customer applications. Keys are shown once at creation.
+      <div className="card-premium" style={{ padding: "2rem" }}>
+        <h2 style={{ fontSize: "1.3rem", color: "var(--text-dark)" }}>API Key Management</h2>
+        <p style={{ color: "var(--text-muted)", fontSize: "0.85rem", marginTop: "0.2rem" }}>
+          Issue and manage ingestion tokens for client applications. Keys are shown once at creation.
         </p>
       </div>
 
@@ -71,30 +71,30 @@ export default function ApiKeysPage() {
       {createdKeySecret && (
         <div
           style={{
-            padding: "1.5rem",
-            borderRadius: "10px",
-            background: "rgba(0, 255, 204, 0.12)",
-            border: "1px solid #00ffcc",
+            padding: "1.5rem 1.75rem",
+            borderRadius: "12px",
+            background: "var(--accent-emerald-bg)",
+            border: "1px solid var(--accent-emerald)",
             display: "flex",
             flexDirection: "column",
             gap: "0.75rem",
           }}
         >
-          <div style={{ color: "#00ffcc", fontWeight: 700, fontSize: "1rem" }}>
-            🔑 API Key Generated Successfully!
+          <div style={{ color: "var(--accent-emerald)", fontWeight: 700, fontSize: "1rem" }}>
+            API Key Generated Successfully
           </div>
-          <div style={{ color: "#a098b0", fontSize: "0.85rem" }}>
-            Make sure to copy your API key now. You will not be able to see it again!
+          <div style={{ color: "var(--text-body)", fontSize: "0.85rem" }}>
+            Make sure to copy your API key now. You will not be able to view it again!
           </div>
           <div
             style={{
               display: "flex",
               alignItems: "center",
-              gap: "10px",
-              background: "#0a0a12",
-              padding: "0.75rem",
-              borderRadius: "6px",
-              border: "1px solid var(--border-glass)",
+              gap: "12px",
+              background: "var(--surface-white)",
+              padding: "0.75rem 1rem",
+              borderRadius: "8px",
+              border: "1px solid var(--border-light)",
             }}
           >
             <input
@@ -105,9 +105,10 @@ export default function ApiKeysPage() {
                 flex: 1,
                 background: "transparent",
                 border: "none",
-                color: "#ff2d78",
+                color: "var(--text-dark)",
                 fontSize: "0.95rem",
                 fontFamily: "'Space Grotesk', monospace",
+                fontWeight: 600,
                 outline: "none",
               }}
             />
@@ -116,14 +117,14 @@ export default function ApiKeysPage() {
                 navigator.clipboard.writeText(createdKeySecret);
                 alert("API Key copied to clipboard!");
               }}
-              className="btn-neon-cyan"
-              style={{ padding: "0.4rem 0.8rem", fontSize: "0.8rem" }}
+              className="btn-primary"
+              style={{ padding: "0.4rem 0.9rem", fontSize: "0.8rem" }}
             >
               Copy Key
             </button>
             <button
               onClick={() => setCreatedKeySecret(null)}
-              style={{ background: "transparent", border: "none", color: "#a098b0", cursor: "pointer" }}
+              style={{ background: "transparent", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: "0.85rem" }}
             >
               Done
             </button>
@@ -132,84 +133,77 @@ export default function ApiKeysPage() {
       )}
 
       {/* Create Key Form */}
-      <div className="glass-card" style={{ padding: "1.5rem" }}>
-        <form onSubmit={handleCreateKey} style={{ display: "flex", gap: "1rem", alignItems: "flex-end" }}>
+      <div className="card-premium" style={{ padding: "2rem" }}>
+        <form onSubmit={handleCreateKey} style={{ display: "flex", gap: "1.25rem", alignItems: "flex-end" }}>
           <div style={{ flex: 1 }}>
             <label
               style={{
                 display: "block",
                 fontSize: "0.8rem",
-                color: "#a098b0",
+                color: "var(--text-muted)",
                 textTransform: "uppercase",
                 fontFamily: "'Space Grotesk', monospace",
+                fontWeight: 600,
                 marginBottom: "0.4rem",
               }}
             >
-              New Key Name
+              New Key Identifier
             </label>
             <input
               type="text"
               required
-              className="input-dark"
+              className="input-premium"
               placeholder="e.g. Production Ingestion Engine"
               value={newKeyName}
               onChange={(e) => setNewKeyName(e.target.value)}
             />
           </div>
-          <button type="submit" className="btn-neon-pink" style={{ padding: "0.75rem 1.5rem" }}>
+          <button type="submit" className="btn-primary" style={{ padding: "0.75rem 1.6rem" }}>
             + Create API Key
           </button>
         </form>
       </div>
 
       {/* Keys Table */}
-      <div className="glass-card" style={{ padding: "1.5rem" }}>
+      <div className="card-premium" style={{ padding: "2rem" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
           <thead>
-            <tr style={{ borderBottom: "1px solid var(--border-glass)", color: "#a098b0", fontSize: "0.8rem" }}>
-              <th style={{ padding: "0.75rem" }}>NAME</th>
-              <th style={{ padding: "0.75rem" }}>KEY PREFIX</th>
-              <th style={{ padding: "0.75rem" }}>LAST USED</th>
-              <th style={{ padding: "0.75rem" }}>STATUS</th>
-              <th style={{ padding: "0.75rem", textAlign: "right" }}>ACTIONS</th>
+            <tr style={{ borderBottom: "1px solid var(--border-light)", color: "var(--text-muted)", fontSize: "0.8rem" }}>
+              <th style={{ padding: "0.85rem 1rem" }}>NAME</th>
+              <th style={{ padding: "0.85rem 1rem" }}>KEY PREFIX</th>
+              <th style={{ padding: "0.85rem 1rem" }}>LAST USED</th>
+              <th style={{ padding: "0.85rem 1rem" }}>STATUS</th>
+              <th style={{ padding: "0.85rem 1rem", textAlign: "right" }}>ACTIONS</th>
             </tr>
           </thead>
           <tbody>
             {keys.map((k) => (
-              <tr key={k.id} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
-                <td style={{ padding: "0.75rem", fontWeight: 600, color: "#e8e0f0" }}>{k.name}</td>
-                <td style={{ padding: "0.75rem", fontFamily: "'Space Grotesk', monospace", color: "#00ffcc" }}>
+              <tr key={k.id} style={{ borderBottom: "1px solid var(--border-light)" }}>
+                <td style={{ padding: "0.85rem 1rem", fontWeight: 600, color: "var(--text-dark)" }}>{k.name}</td>
+                <td style={{ padding: "0.85rem 1rem", fontFamily: "'Space Grotesk', monospace", color: "var(--text-dark)" }}>
                   {k.keyPrefix}...
                 </td>
-                <td style={{ padding: "0.75rem", fontSize: "0.85rem", color: "#a098b0" }}>
+                <td style={{ padding: "0.85rem 1rem", fontSize: "0.85rem", color: "var(--text-muted)" }}>
                   {k.lastUsedAt ? new Date(k.lastUsedAt).toLocaleDateString() : "Never"}
                 </td>
-                <td style={{ padding: "0.75rem" }}>
-                  <span
-                    style={{
-                      fontSize: "0.7rem",
-                      padding: "0.2rem 0.5rem",
-                      borderRadius: "4px",
-                      background: k.revokedAt ? "rgba(255, 68, 68, 0.2)" : "rgba(0, 255, 204, 0.2)",
-                      color: k.revokedAt ? "#ff4444" : "#00ffcc",
-                      fontWeight: 700,
-                    }}
-                  >
+                <td style={{ padding: "0.85rem 1rem" }}>
+                  <span className={k.revokedAt ? "badge-terra" : "badge-emerald"}>
                     {k.revokedAt ? "REVOKED" : "ACTIVE"}
                   </span>
                 </td>
-                <td style={{ padding: "0.75rem", textAlign: "right" }}>
+                <td style={{ padding: "0.85rem 1rem", textAlign: "right" }}>
                   {!k.revokedAt && (
                     <button
                       onClick={() => handleRevokeKey(k.id)}
                       style={{
                         background: "transparent",
-                        border: "1px solid #ff4444",
-                        color: "#ff4444",
-                        padding: "0.3rem 0.6rem",
-                        borderRadius: "4px",
-                        fontSize: "0.75rem",
+                        border: "1px solid var(--accent-terra)",
+                        color: "var(--accent-terra)",
+                        padding: "0.3rem 0.7rem",
+                        borderRadius: "6px",
+                        fontSize: "0.78rem",
                         cursor: "pointer",
+                        fontWeight: 500,
                       }}
                     >
                       Revoke

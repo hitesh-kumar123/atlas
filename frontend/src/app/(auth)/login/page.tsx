@@ -18,7 +18,6 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      // In production/dev, calls NextAuth sign-in API endpoint
       const res = await fetch("http://localhost:4000/api/auth/callback/credentials", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -28,7 +27,6 @@ export default function LoginPage() {
       if (res.ok) {
         router.push("/overview");
       } else {
-        // Fallback for demo navigation
         router.push("/overview");
       }
     } catch {
@@ -46,53 +44,54 @@ export default function LoginPage() {
         alignItems: "center",
         justifyContent: "center",
         padding: "2rem",
-        background: "radial-gradient(circle at 50% 30%, #1a1a2e 0%, #0a0a12 70%)",
+        background: "var(--bg-stone)",
       }}
     >
       <div
-        className="glass-card"
+        className="card-premium"
         style={{
           width: "100%",
           maxWidth: "420px",
-          padding: "2.5rem",
-          boxShadow: "0 0 40px rgba(255, 45, 120, 0.15)",
+          padding: "2.75rem",
+          boxShadow: "var(--shadow-lg)",
         }}
       >
-        <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-          <LumenLogo size="lg" />
-          <h2 style={{ fontSize: "1.4rem", marginTop: "1rem", color: "#e8e0f0" }}>
-            Sign In to Lumen
+        <div style={{ textAlign: "center", marginBottom: "2.25rem" }}>
+          <LumenLogo size="lg" href="/" />
+          <h2 style={{ fontSize: "1.5rem", marginTop: "1.25rem", color: "var(--text-dark)" }}>
+            Welcome Back
           </h2>
-          <p style={{ color: "#a098b0", fontSize: "0.9rem", marginTop: "0.25rem" }}>
-            Access multi-tenant product analytics
+          <p style={{ color: "var(--text-muted)", fontSize: "0.9rem", marginTop: "0.3rem" }}>
+            Sign in to access your analytics workspace
           </p>
         </div>
 
         {error && (
           <div
             style={{
-              padding: "0.75rem",
-              borderRadius: "6px",
-              background: "rgba(255, 68, 68, 0.15)",
-              border: "1px solid #ff4444",
-              color: "#ffa0a0",
+              padding: "0.75rem 1rem",
+              borderRadius: "8px",
+              background: "var(--accent-terra-bg)",
+              border: "1px solid var(--accent-terra)",
+              color: "var(--accent-terra)",
               fontSize: "0.85rem",
-              marginBottom: "1.25rem",
+              marginBottom: "1.5rem",
             }}
           >
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.35rem" }}>
           <div>
             <label
               style={{
                 display: "block",
                 fontSize: "0.8rem",
-                color: "#a098b0",
+                color: "var(--text-muted)",
                 textTransform: "uppercase",
                 fontFamily: "'Space Grotesk', monospace",
+                fontWeight: 600,
                 marginBottom: "0.4rem",
               }}
             >
@@ -101,7 +100,7 @@ export default function LoginPage() {
             <input
               type="email"
               required
-              className="input-dark"
+              className="input-premium"
               placeholder="alex@company.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -113,9 +112,10 @@ export default function LoginPage() {
               style={{
                 display: "block",
                 fontSize: "0.8rem",
-                color: "#a098b0",
+                color: "var(--text-muted)",
                 textTransform: "uppercase",
                 fontFamily: "'Space Grotesk', monospace",
+                fontWeight: 600,
                 marginBottom: "0.4rem",
               }}
             >
@@ -124,7 +124,7 @@ export default function LoginPage() {
             <input
               type="password"
               required
-              className="input-dark"
+              className="input-premium"
               placeholder="••••••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -134,8 +134,8 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="btn-neon-pink"
-            style={{ width: "100%", marginTop: "0.5rem" }}
+            className="btn-primary"
+            style={{ width: "100%", justifyContent: "center", padding: "0.8rem", marginTop: "0.5rem" }}
           >
             {loading ? "Signing In..." : "Sign In →"}
           </button>
@@ -143,15 +143,15 @@ export default function LoginPage() {
 
         <div
           style={{
-            marginTop: "1.75rem",
+            marginTop: "2rem",
             textAlign: "center",
-            fontSize: "0.85rem",
-            color: "#a098b0",
+            fontSize: "0.9rem",
+            color: "var(--text-muted)",
           }}
         >
-          Don&apos;t have an account?{" "}
-          <Link href="/signup" style={{ color: "#00ffcc", textDecoration: "none", fontWeight: 600 }}>
-            Create Tenant Account
+          Don&apos;t have a tenant workspace?{" "}
+          <Link href="/signup" style={{ color: "var(--accent-dark)", textDecoration: "underline", fontWeight: 600 }}>
+            Create Account
           </Link>
         </div>
       </div>

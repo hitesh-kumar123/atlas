@@ -47,17 +47,20 @@ function DashboardHeader() {
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        padding: "0.85rem 2rem",
-        borderBottom: "1px solid var(--border-glass)",
-        backgroundColor: "#0f0f1a",
+        padding: "0.85rem 2.5rem",
+        borderBottom: "1px solid var(--border-light)",
+        backgroundColor: "var(--surface-white)",
         position: "sticky",
         top: 0,
         zIndex: 100,
+        boxShadow: "var(--shadow-sm)",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: "2rem" }}>
-        <LumenLogo size="md" />
+      <div style={{ display: "flex", alignItems: "center", gap: "2.5rem" }}>
+        {/* Logo links back home to / */}
+        <LumenLogo size="md" href="/" />
 
+        {/* Active Tenant Switcher Dropdown */}
         <div style={{ position: "relative" }}>
           <button
             onClick={() => setOrgDropdownOpen(!orgDropdownOpen)}
@@ -65,46 +68,42 @@ function DashboardHeader() {
               display: "flex",
               alignItems: "center",
               gap: "8px",
-              background: "var(--surface-container)",
-              border: "1px solid var(--border-glass)",
-              color: "#e8e0f0",
-              padding: "0.4rem 0.8rem",
+              background: "var(--surface-muted)",
+              border: "1px solid var(--border-light)",
+              color: "var(--text-dark)",
+              padding: "0.45rem 0.85rem",
               borderRadius: "8px",
               fontSize: "0.85rem",
+              fontWeight: 600,
               fontFamily: "'Sora', sans-serif",
               cursor: "pointer",
+              transition: "all 0.15s ease",
             }}
           >
-            <span style={{ fontWeight: 600 }}>{activeOrg.name}</span>
-            <span
-              style={{
-                fontSize: "0.7rem",
-                padding: "0.15rem 0.4rem",
-                borderRadius: "4px",
-                background: "rgba(255, 45, 120, 0.2)",
-                color: "#ff2d78",
-              }}
-            >
+            <span>{activeOrg.name}</span>
+            <span className="badge-emerald" style={{ fontSize: "0.7rem", padding: "0.1rem 0.4rem" }}>
               {activeOrg.role}
             </span>
-            <span style={{ color: "#a098b0" }}>▼</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M6 9l6 6 6-6" />
+            </svg>
           </button>
 
           {orgDropdownOpen && (
             <div
-              className="glass-card"
+              className="card-premium"
               style={{
                 position: "absolute",
-                top: "110%",
+                top: "115%",
                 left: 0,
                 width: "220px",
                 padding: "0.5rem",
                 zIndex: 200,
-                boxShadow: "0 10px 25px rgba(0,0,0,0.5)",
+                boxShadow: "var(--shadow-lg)",
               }}
             >
-              <div style={{ fontSize: "0.75rem", color: "#a098b0", padding: "0.4rem 0.6rem" }}>
-                Switch Tenant
+              <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", padding: "0.4rem 0.6rem", fontWeight: 600 }}>
+                SELECT TENANT WORKSPACE
               </div>
               {orgsList.map((org) => (
                 <div
@@ -120,13 +119,14 @@ function DashboardHeader() {
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
-                    background: org.slug === activeOrg.slug ? "rgba(255, 45, 120, 0.1)" : "transparent",
-                    color: org.slug === activeOrg.slug ? "#ff2d78" : "#e8e0f0",
+                    background: org.slug === activeOrg.slug ? "var(--surface-muted)" : "transparent",
+                    color: "var(--text-dark)",
                     fontSize: "0.85rem",
+                    fontWeight: org.slug === activeOrg.slug ? 600 : 400,
                   }}
                 >
                   <span>{org.name}</span>
-                  <span style={{ fontSize: "0.7rem", color: "#a098b0" }}>{org.role}</span>
+                  <span style={{ fontSize: "0.7rem", color: "var(--text-muted)" }}>{org.role}</span>
                 </div>
               ))}
             </div>
@@ -134,64 +134,79 @@ function DashboardHeader() {
         </div>
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+      {/* Date Range Selector (URL Query state) */}
+      <div style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
         <div
           style={{
             display: "flex",
             alignItems: "center",
-            gap: "0.4rem",
-            background: "var(--surface-dim)",
-            border: "1px solid var(--border-glass)",
+            gap: "0.5rem",
+            background: "var(--surface-muted)",
+            border: "1px solid var(--border-light)",
             borderRadius: "8px",
-            padding: "0.25rem 0.5rem",
+            padding: "0.3rem 0.6rem",
             fontSize: "0.8rem",
-            color: "#a098b0",
+            color: "var(--text-body)",
             fontFamily: "'Space Grotesk', monospace",
           }}
         >
-          <span>📅 {currentFrom} → {currentTo}</span>
-          <button
-            onClick={() => handleDateChange("7d")}
-            style={{
-              background: "transparent",
-              border: "none",
-              color: "#00ffcc",
-              cursor: "pointer",
-              padding: "0.2rem 0.4rem",
-              borderRadius: "4px",
-            }}
-          >
-            7D
-          </button>
-          <button
-            onClick={() => handleDateChange("30d")}
-            style={{
-              background: "transparent",
-              border: "none",
-              color: "#00ffcc",
-              cursor: "pointer",
-              padding: "0.2rem 0.4rem",
-              borderRadius: "4px",
-            }}
-          >
-            30D
-          </button>
-          <button
-            onClick={() => handleDateChange("90d")}
-            style={{
-              background: "transparent",
-              border: "none",
-              color: "#00ffcc",
-              cursor: "pointer",
-              padding: "0.2rem 0.4rem",
-              borderRadius: "4px",
-            }}
-          >
-            90D
-          </button>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+            <line x1="16" y1="2" x2="16" y2="6" />
+            <line x1="8" y1="2" x2="8" y2="6" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+          </svg>
+          <span>{currentFrom} → {currentTo}</span>
+          <div style={{ display: "flex", gap: "2px", marginLeft: "4px" }}>
+            <button
+              onClick={() => handleDateChange("7d")}
+              style={{
+                background: "var(--surface-white)",
+                border: "1px solid var(--border-light)",
+                color: "var(--text-dark)",
+                cursor: "pointer",
+                padding: "0.15rem 0.4rem",
+                borderRadius: "4px",
+                fontSize: "0.75rem",
+                fontWeight: 600,
+              }}
+            >
+              7D
+            </button>
+            <button
+              onClick={() => handleDateChange("30d")}
+              style={{
+                background: "var(--surface-white)",
+                border: "1px solid var(--border-light)",
+                color: "var(--text-dark)",
+                cursor: "pointer",
+                padding: "0.15rem 0.4rem",
+                borderRadius: "4px",
+                fontSize: "0.75rem",
+                fontWeight: 600,
+              }}
+            >
+              30D
+            </button>
+            <button
+              onClick={() => handleDateChange("90d")}
+              style={{
+                background: "var(--surface-white)",
+                border: "1px solid var(--border-light)",
+                color: "var(--text-dark)",
+                cursor: "pointer",
+                padding: "0.15rem 0.4rem",
+                borderRadius: "4px",
+                fontSize: "0.75rem",
+                fontWeight: 600,
+              }}
+            >
+              90D
+            </button>
+          </div>
         </div>
 
-        <Link href="/login" style={{ color: "#a098b0", textDecoration: "none", fontSize: "0.85rem" }}>
+        <Link href="/login" style={{ color: "var(--text-muted)", textDecoration: "none", fontSize: "0.9rem", fontWeight: 500 }}>
           Sign Out
         </Link>
       </div>
@@ -211,18 +226,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   ];
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-      <Suspense fallback={<div style={{ height: "60px", background: "#0f0f1a" }} />}>
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "var(--bg-stone)" }}>
+      <Suspense fallback={<div style={{ height: "60px", background: "var(--surface-white)" }} />}>
         <DashboardHeader />
       </Suspense>
 
+      {/* Sub Navigation Tabs */}
       <nav
         style={{
           display: "flex",
-          gap: "1.5rem",
-          padding: "0 2rem",
-          borderBottom: "1px solid var(--border-glass)",
-          backgroundColor: "var(--bg-dark)",
+          gap: "1.75rem",
+          padding: "0 2.5rem",
+          borderBottom: "1px solid var(--border-light)",
+          backgroundColor: "var(--surface-white)",
         }}
       >
         {navItems.map((item) => {
@@ -232,39 +248,27 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               key={item.href}
               href={item.href}
               style={{
-                padding: "0.75rem 0.25rem",
-                color: isActive ? "#ff2d78" : "#a098b0",
+                padding: "0.85rem 0.2rem",
+                color: isActive ? "var(--text-dark)" : "var(--text-muted)",
                 textDecoration: "none",
-                fontWeight: isActive ? 600 : 400,
+                fontWeight: isActive ? 600 : 500,
                 fontSize: "0.9rem",
-                borderBottom: isActive ? "2px solid #ff2d78" : "2px solid transparent",
+                borderBottom: isActive ? "2px solid var(--text-dark)" : "2px solid transparent",
                 display: "flex",
                 alignItems: "center",
                 gap: "6px",
-                transition: "all 0.2s ease",
+                transition: "all 0.15s ease",
               }}
             >
               {item.label}
-              {item.badge && (
-                <span
-                  style={{
-                    fontSize: "0.65rem",
-                    padding: "0.1rem 0.35rem",
-                    borderRadius: "4px",
-                    background: "#00ffcc",
-                    color: "#000",
-                    fontWeight: 700,
-                  }}
-                >
-                  {item.badge}
-                </span>
-              )}
+              {item.badge && <span className="badge-emerald">{item.badge}</span>}
             </Link>
           );
         })}
       </nav>
 
-      <main style={{ flex: 1, padding: "2rem" }}>{children}</main>
+      {/* Content Area */}
+      <main style={{ flex: 1, padding: "2.5rem" }}>{children}</main>
     </div>
   );
 }

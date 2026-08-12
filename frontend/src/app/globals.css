@@ -1,23 +1,28 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@400;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 :root {
-  --bg-dark: #0a0a12;
-  --surface-dim: #0f0f1a;
-  --surface-container: #141422;
-  --surface-variant: #1e1e30;
-  --surface-container-high: #28283e;
+  --bg-stone: #fbfbfa;
+  --surface-white: #ffffff;
+  --surface-muted: #f4f3ef;
+  --surface-hover: #eae8e1;
   
-  --primary-neon: #ff2d78;
-  --primary-glow: rgba(255, 45, 120, 0.4);
-  --secondary-neon: #00ffcc;
-  --secondary-glow: rgba(0, 255, 204, 0.3);
-  --tertiary-neon: #ffe04a;
+  --text-dark: #191817;
+  --text-body: #4a4843;
+  --text-muted: #807c75;
+  --text-subtle: #a39f97;
   
-  --text-main: #e8e0f0;
-  --text-muted: #a098b0;
-  --border-glass: rgba(255, 255, 255, 0.08);
-  --border-neon-pink: rgba(255, 45, 120, 0.3);
-  --border-neon-cyan: rgba(0, 255, 204, 0.3);
+  --border-light: #e6e4de;
+  --border-medium: #d4d1c7;
+
+  --accent-dark: #191817;
+  --accent-terra: #c85a32;
+  --accent-emerald: #0f766e;
+  --accent-emerald-bg: #e6f4f1;
+  --accent-terra-bg: #fdf2ee;
+  
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+  --shadow-md: 0 4px 16px -2px rgba(0, 0, 0, 0.06), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --shadow-lg: 0 12px 32px -4px rgba(0, 0, 0, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.04);
 }
 
 * {
@@ -27,88 +32,87 @@
 }
 
 body {
-  background-color: var(--bg-dark);
-  color: var(--text-main);
-  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-stone);
+  color: var(--text-body);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Sora', sans-serif;
-  letter-spacing: -0.02em;
+  color: var(--text-dark);
+  letter-spacing: -0.03em;
 }
 
 .font-metric {
   font-family: 'Space Grotesk', monospace;
 }
 
-/* Glassmorphic card utility */
-.glass-card {
-  background: rgba(20, 20, 34, 0.65);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--border-glass);
-  border-radius: 12px;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+/* Premium Card Component */
+.card-premium {
+  background: var(--surface-white);
+  border: 1px solid var(--border-light);
+  border-radius: 14px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.glass-card:hover {
-  border-color: rgba(255, 255, 255, 0.15);
+.card-premium:hover {
+  border-color: var(--border-medium);
+  box-shadow: var(--shadow-md);
 }
 
-/* Glowing Neon utility classes */
-.glow-pink {
-  text-shadow: 0 0 12px var(--primary-glow);
-}
-
-.glow-cyan {
-  text-shadow: 0 0 12px var(--secondary-glow);
-}
-
-.btn-neon-pink {
-  background: rgba(255, 45, 120, 0.15);
-  color: var(--primary-neon);
-  border: 1px solid var(--primary-neon);
-  box-shadow: 0 0 16px var(--primary-glow);
-  padding: 0.6rem 1.2rem;
+/* Button Styles */
+.btn-primary {
+  background: var(--accent-dark);
+  color: #ffffff;
+  border: 1px solid var(--accent-dark);
+  padding: 0.65rem 1.4rem;
   border-radius: 8px;
-  font-family: 'Sora', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight: 600;
+  font-size: 0.9rem;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   transition: all 0.2s ease;
 }
 
-.btn-neon-pink:hover {
-  background: var(--primary-neon);
-  color: #000;
-  box-shadow: 0 0 24px var(--primary-neon);
+.btn-primary:hover {
+  background: #2e2c29;
+  border-color: #2e2c29;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
-.btn-neon-cyan {
-  background: rgba(0, 255, 204, 0.1);
-  color: var(--secondary-neon);
-  border: 1px solid var(--secondary-neon);
-  box-shadow: 0 0 16px var(--secondary-glow);
-  padding: 0.6rem 1.2rem;
+.btn-secondary {
+  background: var(--surface-white);
+  color: var(--text-dark);
+  border: 1px solid var(--border-medium);
+  padding: 0.65rem 1.4rem;
   border-radius: 8px;
-  font-family: 'Sora', sans-serif;
-  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 0.9rem;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   transition: all 0.2s ease;
 }
 
-.btn-neon-cyan:hover {
-  background: var(--secondary-neon);
-  color: #000;
-  box-shadow: 0 0 24px var(--secondary-neon);
+.btn-secondary:hover {
+  background: var(--surface-muted);
+  border-color: var(--text-dark);
 }
 
-.input-dark {
-  background: var(--surface-dim);
-  border: 1px solid var(--border-glass);
-  color: var(--text-main);
+/* Input Fields */
+.input-premium {
+  background: var(--surface-white);
+  border: 1px solid var(--border-medium);
+  color: var(--text-dark);
   padding: 0.75rem 1rem;
   border-radius: 8px;
   outline: none;
@@ -117,20 +121,40 @@ h1, h2, h3, h4, h5, h6 {
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.input-dark:focus {
-  border-color: var(--secondary-neon);
-  box-shadow: 0 0 12px var(--secondary-glow);
+.input-premium:focus {
+  border-color: var(--accent-dark);
+  box-shadow: 0 0 0 3px rgba(25, 24, 23, 0.08);
+}
+
+/* Badge Styles */
+.badge-emerald {
+  background: var(--accent-emerald-bg);
+  color: var(--accent-emerald);
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: 'Space Grotesk', monospace;
+}
+
+.badge-terra {
+  background: var(--accent-terra-bg);
+  color: var(--accent-terra);
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: 'Space Grotesk', monospace;
 }
 
 /* Skeleton Loading Animation */
 @keyframes pulse-skeleton {
-  0% { opacity: 0.4; }
-  50% { opacity: 0.8; }
-  100% { opacity: 0.4; }
+  0% { background-color: #f0eee8; }
+  50% { background-color: #e5e3dc; }
+  100% { background-color: #f0eee8; }
 }
 
 .skeleton {
-  background: var(--surface-variant);
   border-radius: 6px;
   animation: pulse-skeleton 1.5s infinite ease-in-out;
 }

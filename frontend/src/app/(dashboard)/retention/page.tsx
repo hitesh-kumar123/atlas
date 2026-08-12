@@ -16,29 +16,35 @@ export default function RetentionGridPage() {
 
   const getHeatmapBg = (val: number | null) => {
     if (val === null) return "transparent";
-    if (val >= 80) return "rgba(0, 255, 204, 0.4)";
-    if (val >= 50) return "rgba(0, 255, 204, 0.25)";
-    if (val >= 30) return "rgba(0, 255, 204, 0.15)";
-    return "rgba(0, 255, 204, 0.06)";
+    if (val >= 80) return "#191817";
+    if (val >= 50) return "#4a4843";
+    if (val >= 30) return "#807c75";
+    return "#e6e4de";
+  };
+
+  const getTextColor = (val: number | null) => {
+    if (val === null) return "#a39f97";
+    if (val >= 30) return "#ffffff";
+    return "#191817";
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-      <div className="glass-card" style={{ padding: "1.5rem" }}>
-        <h2 style={{ fontSize: "1.3rem", color: "#e8e0f0" }}>Cohort Retention Grid</h2>
-        <p style={{ color: "#a098b0", fontSize: "0.85rem", marginTop: "0.2rem" }}>
-          N-week cohort retention percentage matrix by signup week
+    <div style={{ display: "flex", flexDirection: "column", gap: "1.75rem" }}>
+      <div className="card-premium" style={{ padding: "2rem" }}>
+        <h2 style={{ fontSize: "1.3rem", color: "var(--text-dark)" }}>Cohort Retention Matrix</h2>
+        <p style={{ color: "var(--text-muted)", fontSize: "0.85rem", marginTop: "0.2rem" }}>
+          N-week cohort retention percentage heatmap matrix by signup week
         </p>
       </div>
 
-      <div className="glass-card" style={{ padding: "1.5rem", overflowX: "auto" }}>
-        <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: "6px", textAlign: "center" }}>
+      <div className="card-premium" style={{ padding: "2rem", overflowX: "auto" }}>
+        <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: "8px", textAlign: "center" }}>
           <thead>
-            <tr style={{ color: "#a098b0", fontSize: "0.8rem", fontFamily: "'Space Grotesk', monospace" }}>
-              <th style={{ textAlign: "left", padding: "0.5rem" }}>COHORT WEEK</th>
-              <th style={{ padding: "0.5rem" }}>USERS</th>
+            <tr style={{ color: "var(--text-muted)", fontSize: "0.8rem", fontFamily: "'Space Grotesk', monospace", fontWeight: 600 }}>
+              <th style={{ textAlign: "left", padding: "0.5rem 0.8rem" }}>COHORT WEEK</th>
+              <th style={{ padding: "0.5rem 0.8rem" }}>USERS</th>
               {weeks.map((w) => (
-                <th key={w} style={{ padding: "0.5rem" }}>
+                <th key={w} style={{ padding: "0.5rem 0.8rem" }}>
                   {w}
                 </th>
               ))}
@@ -50,15 +56,16 @@ export default function RetentionGridPage() {
                 <td
                   style={{
                     textAlign: "left",
-                    padding: "0.6rem 0.8rem",
+                    padding: "0.75rem 0.8rem",
                     fontSize: "0.85rem",
                     fontFamily: "'Space Grotesk', monospace",
-                    color: "#00ffcc",
+                    color: "var(--text-dark)",
+                    fontWeight: 600,
                   }}
                 >
                   {row.cohort}
                 </td>
-                <td style={{ padding: "0.6rem", fontSize: "0.85rem", fontWeight: 600 }}>
+                <td style={{ padding: "0.75rem", fontSize: "0.85rem", fontWeight: 600 }}>
                   {row.users.toLocaleString()}
                 </td>
 
@@ -66,14 +73,13 @@ export default function RetentionGridPage() {
                   <td
                     key={idx}
                     style={{
-                      padding: "0.6rem",
-                      borderRadius: "6px",
+                      padding: "0.75rem",
+                      borderRadius: "8px",
                       background: getHeatmapBg(val),
-                      color: val !== null ? "#e8e0f0" : "#5a5068",
+                      color: getTextColor(val),
                       fontSize: "0.85rem",
                       fontWeight: 600,
                       fontFamily: "'Space Grotesk', monospace",
-                      border: val !== null ? "1px solid rgba(0, 255, 204, 0.2)" : "1px solid transparent",
                     }}
                   >
                     {val !== null ? `${val.toFixed(1)}%` : "-"}
