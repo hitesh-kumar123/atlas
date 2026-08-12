@@ -39,7 +39,8 @@ export async function verifyApiKey(plaintextKey: string): Promise<{ tenantId: st
 
     const valid = await argon2.verify(candidate.key_hash, plaintextKey);
     if (valid) {
-      basePrisma.$executeRaw`UPDATE api_keys SET "lastUsedAt" = NOW() WHERE id = ${candidate.id}`.catch(() => {});
+      // Async update lastUsedAt via SECURITY DEFINER function (bypasses unset tenant_id under RLS)
+      basePrisma.$executeRaw`SELECT update_api_key_last_used(${candidate.id})`.catch(() => {});
       return { tenantId: candidate.tenant_id, apiKeyId: candidate.id };
     }
   }

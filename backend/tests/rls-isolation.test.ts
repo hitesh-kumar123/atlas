@@ -2,30 +2,37 @@ import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { PrismaClient } from "@prisma/client";
 import { randomBytes } from "node:crypto";
 
-const prisma = new PrismaClient();
+// APP_DATABASE_URL connects as the app_user role (which RLS actually restricts)
+const appPrisma = new PrismaClient({
+  datasourceUrl: process.env.APP_DATABASE_URL ?? process.env.DATABASE_URL,
+});
+// Admin client for tenant provisioning/cleanup
+const adminPrisma = new PrismaClient({
+  datasourceUrl: process.env.DATABASE_URL,
+});
 
 let tenantAId: string;
 let tenantBId: string;
 
 beforeAll(async () => {
   const suffix = randomBytes(4).toString("hex");
-  const tenantA = await prisma.tenant.create({
+  const tenantA = await adminPrisma.tenant.create({
     data: { name: `RLS Test A ${suffix}`, slug: `rls-test-a-${suffix}` },
   });
-  const tenantB = await prisma.tenant.create({
+  const tenantB = await adminPrisma.tenant.create({
     data: { name: `RLS Test B ${suffix}`, slug: `rls-test-b-${suffix}` },
   });
   tenantAId = tenantA.id;
   tenantBId = tenantB.id;
 
-  await prisma.$transaction(async (tx) => {
+  await appPrisma.$transaction(async (tx) => {
     await tx.$executeRaw`SELECT set_config('app.tenant_id', ${tenantAId}, true)`;
     await tx.event.create({
       data: { tenantId: tenantAId, name: "signup", distinctId: "user-a-1" },
     });
   });
 
-  await prisma.$transaction(async (tx) => {
+  await appPrisma.$transaction(async (tx) => {
     await tx.$executeRaw`SELECT set_config('app.tenant_id', ${tenantBId}, true)`;
     await tx.event.create({
       data: { tenantId: tenantBId, name: "signup", distinctId: "user-b-1" },
@@ -34,22 +41,23 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await prisma.$transaction(async (tx) => {
+  await appPrisma.$transaction(async (tx) => {
     await tx.$executeRaw`SELECT set_config('app.tenant_id', ${tenantAId}, true)`;
     await tx.event.deleteMany({ where: { tenantId: tenantAId } });
   });
-  await prisma.$transaction(async (tx) => {
+  await appPrisma.$transaction(async (tx) => {
     await tx.$executeRaw`SELECT set_config('app.tenant_id', ${tenantBId}, true)`;
     await tx.event.deleteMany({ where: { tenantId: tenantBId } });
   });
-  await prisma.tenant.delete({ where: { id: tenantAId } });
-  await prisma.tenant.delete({ where: { id: tenantBId } });
-  await prisma.$disconnect();
+  await adminPrisma.tenant.delete({ where: { id: tenantAId } });
+  await adminPrisma.tenant.delete({ where: { id: tenantBId } });
+  await appPrisma.$disconnect();
+  await adminPrisma.$disconnect();
 });
 
 describe("RLS tenant isolation", () => {
   it("returns zero foreign rows even with no WHERE clause, as tenant A", async () => {
-    await prisma.$transaction(async (tx) => {
+    await appPrisma.$transaction(async (tx) => {
       await tx.$executeRaw`SELECT set_config('app.tenant_id', ${tenantAId}, true)`;
 
       const allEvents = await tx.event.findMany();
@@ -61,7 +69,7 @@ describe("RLS tenant isolation", () => {
   });
 
   it("returns zero rows when app.tenant_id is never set at all", async () => {
-    await prisma.$transaction(async (tx) => {
+    await appPrisma.$transaction(async (tx) => {
       const events = await tx.event.findMany();
       expect(events.length).toBe(0);
     });
@@ -69,7 +77,7 @@ describe("RLS tenant isolation", () => {
 
   it("blocks cross-tenant writes via WITH CHECK", async () => {
     await expect(
-      prisma.$transaction(async (tx) => {
+      appPrisma.$transaction(async (tx) => {
         await tx.$executeRaw`SELECT set_config('app.tenant_id', ${tenantAId}, true)`;
         await tx.event.create({
           data: { tenantId: tenantBId, name: "spoofed", distinctId: "attacker" },
@@ -78,3 +86,4 @@ describe("RLS tenant isolation", () => {
     ).rejects.toThrow();
   });
 });
+

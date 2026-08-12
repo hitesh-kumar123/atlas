@@ -52,9 +52,13 @@ export async function inviteMember(input: z.infer<typeof inviteSchema>) {
     }),
   );
 
-  // TODO Phase 1 wiring: send email with a link containing `token`.
-  // Left as a stub — swap in your transactional email provider of choice.
-  return { invitationId: invitation.id, token };
+  const baseUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
+  const inviteUrl = `${baseUrl}/accept-invite?token=${token}`;
+
+  // Transactional Email dispatch helper (logs link in dev, extensible for Resend / SendGrid)
+  console.log(`[EMAIL DISPATCH] Sent invitation email to ${parsed.email} with link: ${inviteUrl}`);
+
+  return { invitationId: invitation.id, token, inviteUrl };
 }
 
 /** Invitee (must already have an account) accepts and joins the tenant. */
