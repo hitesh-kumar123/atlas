@@ -5,31 +5,43 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LumenLogo } from "@/components/LumenLogo";
 
+interface FieldErrors {
+  email?: string;
+  password?: string;
+}
+
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [serverError, setServerError] = useState<string | null>(null);
 
   const validateForm = (): boolean => {
+    const errors: FieldErrors = {};
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setError("Please enter a valid email address.");
-      return false;
+    if (!email.trim()) {
+      errors.email = "Work email is required.";
+    } else if (!emailRegex.test(email)) {
+      errors.email = "Please enter a valid email address (e.g., alex@company.com).";
     }
-    if (!password || password.length < 8) {
-      setError("Password must be at least 8 characters long.");
-      return false;
+
+    if (!password) {
+      errors.password = "Password is required.";
+    } else if (password.length < 8) {
+      errors.password = "Password must be at least 8 characters long.";
     }
-    return true;
+
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
+    setServerError(null);
 
-    // Client-side validation check
     if (!validateForm()) {
       return;
     }
@@ -46,15 +58,14 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error ?? "Invalid email or password combination.");
+        setServerError(data.error ?? "Invalid email or password combination.");
         setLoading(false);
         return;
       }
 
-      // Successful validation & authentication
       router.push("/overview");
     } catch {
-      setError("Unable to connect to authentication server. Please try again.");
+      setServerError("Unable to connect to authentication server. Please try again.");
       setLoading(false);
     }
   };
@@ -89,7 +100,7 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {error && (
+        {serverError && (
           <div
             style={{
               padding: "0.75rem 1rem",
@@ -102,7 +113,7 @@ export default function LoginPage() {
               marginBottom: "1.5rem",
             }}
           >
-            {error}
+            {serverError}
           </div>
         )}
 
@@ -123,12 +134,22 @@ export default function LoginPage() {
             </label>
             <input
               type="email"
-              required
               className="input-premium"
+              style={{
+                borderColor: fieldErrors.email ? "var(--accent-terra)" : undefined,
+              }}
               placeholder="alex@company.com"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (fieldErrors.email) setFieldErrors((prev) => ({ ...prev, email: undefined }));
+              }}
             />
+            {fieldErrors.email && (
+              <span style={{ fontSize: "0.78rem", color: "var(--accent-terra)", marginTop: "0.25rem", display: "block" }}>
+                {fieldErrors.email}
+              </span>
+            )}
           </div>
 
           <div>
@@ -147,12 +168,22 @@ export default function LoginPage() {
             </label>
             <input
               type="password"
-              required
               className="input-premium"
+              style={{
+                borderColor: fieldErrors.password ? "var(--accent-terra)" : undefined,
+              }}
               placeholder="••••••••••••"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                if (fieldErrors.password) setFieldErrors((prev) => ({ ...prev, password: undefined }));
+              }}
             />
+            {fieldErrors.password && (
+              <span style={{ fontSize: "0.78rem", color: "var(--accent-terra)", marginTop: "0.25rem", display: "block" }}>
+                {fieldErrors.password}
+              </span>
+            )}
           </div>
 
           <button

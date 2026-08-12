@@ -5,6 +5,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LumenLogo } from "@/components/LumenLogo";
 
+interface FieldErrors {
+  name?: string;
+  orgName?: string;
+  email?: string;
+  password?: string;
+}
+
 export default function SignupPage() {
   const router = useRouter();
   const [name, setName] = useState("");
@@ -12,34 +19,45 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [orgName, setOrgName] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [serverError, setServerError] = useState<string | null>(null);
 
   const validateForm = (): boolean => {
-    if (!name.trim() || name.trim().length < 3) {
-      setError("Full name must be at least 3 characters long.");
-      return false;
+    const errors: FieldErrors = {};
+
+    if (!name.trim()) {
+      errors.name = "Full name is required.";
+    } else if (name.trim().length < 3) {
+      errors.name = "Full name must be at least 3 characters long.";
     }
-    if (!orgName.trim() || orgName.trim().length < 3) {
-      setError("Organisation name must be at least 3 characters long.");
-      return false;
+
+    if (!orgName.trim()) {
+      errors.orgName = "Organisation name is required.";
+    } else if (orgName.trim().length < 3) {
+      errors.orgName = "Organisation name must be at least 3 characters long.";
     }
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setError("Please enter a valid work email address.");
-      return false;
+    if (!email.trim()) {
+      errors.email = "Work email is required.";
+    } else if (!emailRegex.test(email)) {
+      errors.email = "Please enter a valid work email address (e.g., alex@company.com).";
     }
-    if (!password || password.length < 8) {
-      setError("Password must be at least 8 characters long.");
-      return false;
+
+    if (!password) {
+      errors.password = "Password is required.";
+    } else if (password.length < 8) {
+      errors.password = "Password must be at least 8 characters long.";
     }
-    return true;
+
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
+    setServerError(null);
 
-    // Client-side validation check
     if (!validateForm()) {
       return;
     }
@@ -56,15 +74,14 @@ export default function SignupPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error ?? "Failed to create tenant account.");
+        setServerError(data.error ?? "Failed to create tenant account.");
         setLoading(false);
         return;
       }
 
-      // Successful validation & account creation
       router.push("/login?signup=success");
     } catch {
-      setError("Unable to connect to registration server. Please try again.");
+      setServerError("Unable to connect to registration server. Please try again.");
       setLoading(false);
     }
   };
@@ -99,7 +116,7 @@ export default function SignupPage() {
           </p>
         </div>
 
-        {error && (
+        {serverError && (
           <div
             style={{
               padding: "0.75rem 1rem",
@@ -112,7 +129,7 @@ export default function SignupPage() {
               marginBottom: "1.5rem",
             }}
           >
-            {error}
+            {serverError}
           </div>
         )}
 
@@ -133,12 +150,22 @@ export default function SignupPage() {
             </label>
             <input
               type="text"
-              required
               className="input-premium"
+              style={{
+                borderColor: fieldErrors.name ? "var(--accent-terra)" : undefined,
+              }}
               placeholder="Alex Smith"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => {
+                setName(e.target.value);
+                if (fieldErrors.name) setFieldErrors((prev) => ({ ...prev, name: undefined }));
+              }}
             />
+            {fieldErrors.name && (
+              <span style={{ fontSize: "0.78rem", color: "var(--accent-terra)", marginTop: "0.25rem", display: "block" }}>
+                {fieldErrors.name}
+              </span>
+            )}
           </div>
 
           <div>
@@ -157,12 +184,22 @@ export default function SignupPage() {
             </label>
             <input
               type="text"
-              required
               className="input-premium"
+              style={{
+                borderColor: fieldErrors.orgName ? "var(--accent-terra)" : undefined,
+              }}
               placeholder="Acme Corp"
               value={orgName}
-              onChange={(e) => setOrgName(e.target.value)}
+              onChange={(e) => {
+                setOrgName(e.target.value);
+                if (fieldErrors.orgName) setFieldErrors((prev) => ({ ...prev, orgName: undefined }));
+              }}
             />
+            {fieldErrors.orgName && (
+              <span style={{ fontSize: "0.78rem", color: "var(--accent-terra)", marginTop: "0.25rem", display: "block" }}>
+                {fieldErrors.orgName}
+              </span>
+            )}
           </div>
 
           <div>
@@ -181,12 +218,22 @@ export default function SignupPage() {
             </label>
             <input
               type="email"
-              required
               className="input-premium"
+              style={{
+                borderColor: fieldErrors.email ? "var(--accent-terra)" : undefined,
+              }}
               placeholder="alex@acme.com"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (fieldErrors.email) setFieldErrors((prev) => ({ ...prev, email: undefined }));
+              }}
             />
+            {fieldErrors.email && (
+              <span style={{ fontSize: "0.78rem", color: "var(--accent-terra)", marginTop: "0.25rem", display: "block" }}>
+                {fieldErrors.email}
+              </span>
+            )}
           </div>
 
           <div>
@@ -205,13 +252,22 @@ export default function SignupPage() {
             </label>
             <input
               type="password"
-              required
-              minLength={8}
               className="input-premium"
+              style={{
+                borderColor: fieldErrors.password ? "var(--accent-terra)" : undefined,
+              }}
               placeholder="At least 8 characters"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                if (fieldErrors.password) setFieldErrors((prev) => ({ ...prev, password: undefined }));
+              }}
             />
+            {fieldErrors.password && (
+              <span style={{ fontSize: "0.78rem", color: "var(--accent-terra)", marginTop: "0.25rem", display: "block" }}>
+                {fieldErrors.password}
+              </span>
+            )}
           </div>
 
           <button
