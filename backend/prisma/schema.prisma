@@ -1,0 +1,141 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  owner
+  admin
+  viewer
+}
+
+model Tenant {
+  id          String       @id @default(cuid())
+  name        String
+  slug        String       @unique
+  suspended   Boolean      @default(false)
+  createdAt   DateTime     @default(now())
+
+  memberships   Membership[]
+  apiKeys       ApiKey[]
+  events        Event[]
+  invitations   Invitation[]
+  hourlyRollups HourlyEventRollup[]
+  dailyRollups  DailyEventRollup[]
+
+  @@map("tenants")
+}
+
+model User {
+  id            String       @id @default(cuid())
+  email         String       @unique
+  passwordHash  String?
+  name          String?
+  createdAt     DateTime     @default(now())
+
+  memberships   Membership[]
+  invitedBy     Invitation[] @relation("InvitedBy")
+
+  @@map("users")
+}
+
+model Membership {
+  id        String   @id @default(cuid())
+  tenantId  String
+  userId    String
+  role      Role     @default(viewer)
+  createdAt DateTime @default(now())
+
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, userId])
+  @@index([tenantId])
+  @@map("memberships")
+}
+
+model Invitation {
+  id          String   @id @default(cuid())
+  tenantId    String
+  email       String
+  role        Role     @default(viewer)
+  token       String   @unique
+  invitedById String
+  acceptedAt  DateTime?
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+
+  tenant     Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  invitedBy  User     @relation("InvitedBy", fields: [invitedById], references: [id])
+
+  @@index([tenantId])
+  @@map("invitations")
+}
+
+model ApiKey {
+  id          String    @id @default(cuid())
+  tenantId    String
+  name        String
+  keyPrefix   String
+  keyHash     String
+  lastUsedAt  DateTime?
+  revokedAt   DateTime?
+  createdAt   DateTime  @default(now())
+
+  tenant      Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@map("api_keys")
+}
+
+model Event {
+  id             String   @id @default(cuid())
+  tenantId       String
+  name           String
+  distinctId     String
+  properties     Json     @default("{}")
+  idempotencyKey String?
+  occurredAt     DateTime @default(now())
+  receivedAt     DateTime @default(now())
+
+  tenant         Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, occurredAt])
+  @@index([tenantId, name, occurredAt])
+  @@unique([tenantId, idempotencyKey])
+  @@map("events")
+}
+
+model HourlyEventRollup {
+  id          String   @id @default(cuid())
+  tenantId    String
+  name        String
+  bucket      DateTime
+  eventCount  Int      @default(0)
+  uniqueUsers Int      @default(0)
+
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, name, bucket])
+  @@index([tenantId, bucket])
+  @@map("hourly_event_rollups")
+}
+
+model DailyEventRollup {
+  id          String   @id @default(cuid())
+  tenantId    String
+  name        String
+  bucket      DateTime
+  eventCount  Int      @default(0)
+  uniqueUsers Int      @default(0)
+
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, name, bucket])
+  @@index([tenantId, bucket])
+  @@map("daily_event_rollups")
+}
