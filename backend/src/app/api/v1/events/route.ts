@@ -76,11 +76,10 @@ export async function POST(req: Request) {
 
   try {
     const insertedCount = await withTenant(tenantId, async (tx) => {
-      const recordsToInsert = events.map((ev) => {
+      const recordsToInsert = events.map((ev, index) => {
         const idempotencyKey =
           ev.idempotencyKey ??
-          (events.length === 1 ? requestHeaderIdempotencyKey : null) ??
-          undefined;
+          (requestHeaderIdempotencyKey ? `${requestHeaderIdempotencyKey}_${index}` : null);
 
         return {
           tenantId,

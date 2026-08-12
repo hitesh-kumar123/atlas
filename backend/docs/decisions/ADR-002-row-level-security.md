@@ -12,7 +12,7 @@ cross-tenant data leak, and code review won't reliably catch it at scale.
 Enable Row Level Security on every tenant-scoped table (`memberships`,
 `invitations`, `api_keys`, `events`), with `FORCE ROW LEVEL SECURITY` so
 even the owning role is subject to it, and a policy that compares
-`tenant_id` against `current_setting('app.tenant_id', true)`.
+`"tenantId"` against `current_setting('app.tenant_id', true)`.
 
 The app connects as a dedicated low-privilege `app_user` role — never the
 migration role — so RLS is actually in force for every request-serving
