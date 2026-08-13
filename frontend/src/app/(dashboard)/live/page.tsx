@@ -39,6 +39,28 @@ export default function LiveFeedPage() {
     };
   }, [isLiveStreamActive]);
 
+  const fireSampleTestEvent = () => {
+    const eventTypes = ["page_view", "signup_step", "checkout_start", "checkout_complete", "feature_click"];
+    const randomName = eventTypes[Math.floor(Math.random() * eventTypes.length)];
+    const randomUser = `usr_test_${Math.floor(Math.random() * 900 + 100)}`;
+
+    const newEvent: LiveEvent = {
+      id: `evt_${Date.now()}`,
+      name: randomName,
+      distinctId: randomUser,
+      properties: {
+        path: randomName === "page_view" ? "/pricing" : "/checkout",
+        browser: "Chrome",
+        device: "Desktop",
+        timestamp: new Date().toISOString(),
+      },
+      occurredAt: new Date().toISOString(),
+    };
+
+    setEvents((prev) => [newEvent, ...prev.slice(0, 49)]);
+    setSelectedEvent(newEvent);
+  };
+
   return (
     <div style={{ display: "flex", gap: "1.75rem", height: "calc(100vh - 210px)" }}>
       {/* Live Event Stream List */}
@@ -59,19 +81,29 @@ export default function LiveFeedPage() {
             </h2>
           </div>
 
-          <button
-            onClick={() => setIsLiveStreamActive(!isLiveStreamActive)}
-            className={isLiveStreamActive ? "btn-secondary" : "btn-primary"}
-            style={{ padding: "0.4rem 0.9rem", fontSize: "0.85rem" }}
-          >
-            {isLiveStreamActive ? "Pause Stream" : "Resume Stream"}
-          </button>
+          <div style={{ display: "flex", gap: "0.75rem" }}>
+            <button
+              onClick={fireSampleTestEvent}
+              className="btn-primary"
+              style={{ padding: "0.4rem 0.9rem", fontSize: "0.85rem", background: "var(--accent-emerald)", borderColor: "var(--accent-emerald)" }}
+            >
+              + Fire Test Event
+            </button>
+
+            <button
+              onClick={() => setIsLiveStreamActive(!isLiveStreamActive)}
+              className={isLiveStreamActive ? "btn-secondary" : "btn-primary"}
+              style={{ padding: "0.4rem 0.9rem", fontSize: "0.85rem" }}
+            >
+              {isLiveStreamActive ? "Pause Stream" : "Resume Stream"}
+            </button>
+          </div>
         </div>
 
         <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: "10px" }}>
           {events.length === 0 ? (
             <div style={{ padding: "3rem", textAlign: "center", color: "var(--text-muted)" }}>
-              Connecting to SSE live event stream...
+              Connecting to SSE live event stream... Click <strong>&quot;+ Fire Test Event&quot;</strong> above to generate sample events!
             </div>
           ) : (
             events.map((evt) => (

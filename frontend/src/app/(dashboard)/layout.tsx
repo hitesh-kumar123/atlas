@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, Suspense } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { LumenLogo } from "@/components/LumenLogo";
@@ -10,14 +10,53 @@ function DashboardHeader() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [activeOrg, setActiveOrg] = useState({ name: "Acme Corp", slug: "acme-corp", role: "Owner" });
+  // Active tenant & user profile state
+  const [activeOrg, setActiveOrg] = useState<{ name: string; slug: string; role: string }>({
+    name: "My Workspace",
+    slug: "my-workspace",
+    role: "Owner",
+  });
+  const [userName, setUserName] = useState<string>("Hitesh");
   const [orgDropdownOpen, setOrgDropdownOpen] = useState(false);
+  const [orgsList, setOrgsList] = useState<Array<{ name: string; slug: string; role: string }>>([]);
 
-  const orgsList = [
-    { name: "Acme Corp", slug: "acme-corp", role: "Owner" },
-    { name: "Globex Inc", slug: "globex-inc", role: "Admin" },
-    { name: "Initech LLC", slug: "initech-llc", role: "Viewer" },
-  ];
+  useEffect(() => {
+    try {
+      const storedUser = localStorage.getItem("lumen_user");
+      const storedTenant = localStorage.getItem("lumen_tenant");
+
+      let currentUserName = "Hitesh";
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        if (parsedUser?.name) {
+          currentUserName = parsedUser.name;
+          setUserName(parsedUser.name);
+        }
+      }
+
+      let currentOrg = {
+        name: `${currentUserName}'s Workspace`,
+        slug: `${currentUserName.toLowerCase().replace(/\s+/g, "-")}-workspace`,
+        role: "Owner",
+      };
+
+      if (storedTenant) {
+        const parsedTenant = JSON.parse(storedTenant);
+        if (parsedTenant?.name) {
+          currentOrg = {
+            name: parsedTenant.name,
+            slug: parsedTenant.slug || parsedTenant.name.toLowerCase().replace(/\s+/g, "-"),
+            role: "Owner",
+          };
+        }
+      }
+
+      setActiveOrg(currentOrg);
+      setOrgsList([currentOrg]);
+    } catch {
+      // Fallback
+    }
+  }, []);
 
   const currentFrom = searchParams.get("from") ?? "2026-08-01";
   const currentTo = searchParams.get("to") ?? "2026-08-12";
@@ -134,7 +173,7 @@ function DashboardHeader() {
         </div>
       </div>
 
-      {/* Date Range Selector (URL Query state) */}
+      {/* Date Range Selector & User Profile */}
       <div style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
         <div
           style={{
@@ -206,9 +245,22 @@ function DashboardHeader() {
           </div>
         </div>
 
-        <Link href="/login" style={{ color: "var(--text-muted)", textDecoration: "none", fontSize: "0.9rem", fontWeight: 500 }}>
-          Sign Out
-        </Link>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+          <div style={{ textAlign: "right", fontSize: "0.85rem" }}>
+            <div style={{ fontWeight: 600, color: "var(--text-dark)" }}>{userName}</div>
+            <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>Owner</div>
+          </div>
+          <Link
+            href="/login"
+            onClick={() => {
+              localStorage.removeItem("lumen_user");
+              localStorage.removeItem("lumen_tenant");
+            }}
+            style={{ color: "var(--accent-terra)", textDecoration: "none", fontSize: "0.85rem", fontWeight: 500 }}
+          >
+            Sign Out
+          </Link>
+        </div>
       </div>
     </header>
   );
@@ -232,7 +284,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <DashboardHeader />
       </Suspense>
 
-      {/* Sub Navigation Tabs */}
       <nav
         style={{
           display: "flex",
@@ -268,7 +319,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         })}
       </nav>
 
-      {/* Content Area */}
       <main style={{ flex: 1, padding: "2.5rem" }}>{children}</main>
     </div>
   );

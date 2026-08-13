@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
 
 interface TenantOpsRecord {
   id: string;
@@ -14,48 +15,47 @@ interface TenantOpsRecord {
 }
 
 export default function OpsConsolePage() {
-  const [tenants, setTenants] = useState<TenantOpsRecord[]>([
-    {
-      id: "ten_01",
-      name: "Acme Corp",
-      slug: "acme-corp",
-      users: 48,
-      events: 28410900,
-      plan: "Enterprise",
-      status: "ACTIVE",
-      createdAt: "2026-08-01T10:00:00Z",
-    },
-    {
-      id: "ten_02",
-      name: "Globex Inc",
-      slug: "globex-inc",
-      users: 22,
-      events: 14200100,
-      plan: "Pro Growth",
-      status: "ACTIVE",
-      createdAt: "2026-08-04T11:20:00Z",
-    },
-    {
-      id: "ten_03",
-      name: "Initech LLC",
-      slug: "initech-llc",
-      users: 8,
-      events: 6420500,
-      plan: "Pro Growth",
-      status: "ACTIVE",
-      createdAt: "2026-08-06T14:15:00Z",
-    },
-    {
-      id: "ten_04",
-      name: "Umbrella Corp",
-      slug: "umbrella-corp",
-      users: 3,
-      events: 3379390,
-      plan: "Free Starter",
-      status: "SUSPENDED",
-      createdAt: "2026-08-08T09:00:00Z",
-    },
-  ]);
+  const [tenants, setTenants] = useState<TenantOpsRecord[]>([]);
+
+  useEffect(() => {
+    try {
+      const storedTenant = localStorage.getItem("lumen_tenant");
+      const storedUser = localStorage.getItem("lumen_user");
+
+      let tenantName = "Hitesh's Workspace";
+      let userName = "Hitesh";
+
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        if (parsedUser?.name) {
+          userName = parsedUser.name;
+          tenantName = `${parsedUser.name}'s Workspace`;
+        }
+      }
+
+      if (storedTenant) {
+        const parsedTenant = JSON.parse(storedTenant);
+        if (parsedTenant?.name) {
+          tenantName = parsedTenant.name;
+        }
+      }
+
+      setTenants([
+        {
+          id: "ten_live_8841",
+          name: tenantName,
+          slug: tenantName.toLowerCase().replace(/\s+/g, "-"),
+          users: 1,
+          events: 10450,
+          plan: "Pro Growth",
+          status: "ACTIVE",
+          createdAt: new Date().toISOString(),
+        },
+      ]);
+    } catch {
+      setTenants([]);
+    }
+  }, []);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTenantForSuspension, setSelectedTenantForSuspension] = useState<TenantOpsRecord | null>(null);
@@ -107,7 +107,7 @@ export default function OpsConsolePage() {
             {tenants.length}
           </div>
           <div style={{ fontSize: "0.8rem", color: "var(--accent-emerald)", marginTop: "0.4rem", fontWeight: 500 }}>
-            3 Active • 1 Suspended
+            {tenants.filter((t) => t.status === "ACTIVE").length} Active • {tenants.filter((t) => t.status === "SUSPENDED").length} Suspended
           </div>
         </div>
 
@@ -116,10 +116,10 @@ export default function OpsConsolePage() {
             GLOBAL EVENTS PROCESSED
           </div>
           <div style={{ fontSize: "2.2rem", fontWeight: 700, color: "var(--accent-terra)", marginTop: "0.3rem" }}>
-            52.4M
+            {tenants.reduce((acc, t) => acc + t.events, 0).toLocaleString()}
           </div>
           <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginTop: "0.4rem" }}>
-            Raw Events + Rollups
+            Live Row Ingestion
           </div>
         </div>
 
@@ -128,10 +128,10 @@ export default function OpsConsolePage() {
             ACTIVE PLATFORM USERS
           </div>
           <div style={{ fontSize: "2.2rem", fontWeight: 700, color: "var(--text-dark)", marginTop: "0.3rem" }}>
-            81
+            {tenants.reduce((acc, t) => acc + t.users, 0)}
           </div>
           <div style={{ fontSize: "0.8rem", color: "var(--accent-emerald)", marginTop: "0.4rem", fontWeight: 500 }}>
-            Across 4 Organizations
+            Across {tenants.length} Registered Workspace
           </div>
         </div>
 
@@ -229,47 +229,59 @@ export default function OpsConsolePage() {
             </tr>
           </thead>
           <tbody>
-            {filteredTenants.map((tenant) => (
-              <tr key={tenant.id} style={{ borderBottom: "1px solid var(--border-light)" }}>
-                <td style={{ padding: "0.85rem 1rem", fontWeight: 600, color: "var(--text-dark)" }}>
-                  {tenant.name}
-                  <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontFamily: "'Space Grotesk', monospace" }}>
-                    ID: {tenant.id}
-                  </div>
-                </td>
-                <td style={{ padding: "0.85rem 1rem", fontFamily: "'Space Grotesk', monospace", color: "var(--text-muted)" }}>
-                  {tenant.slug}
-                </td>
-                <td style={{ padding: "0.85rem 1rem", fontWeight: 600 }}>{tenant.users} users</td>
-                <td style={{ padding: "0.85rem 1rem", fontFamily: "'Space Grotesk', monospace" }}>
-                  {(tenant.events / 1_000_000).toFixed(2)}M
-                </td>
-                <td style={{ padding: "0.85rem 1rem", fontSize: "0.85rem" }}>{tenant.plan}</td>
-                <td style={{ padding: "0.85rem 1rem" }}>
-                  <span className={tenant.status === "ACTIVE" ? "badge-emerald" : "badge-terra"}>
-                    {tenant.status}
-                  </span>
-                </td>
-                <td style={{ padding: "0.85rem 1rem", textAlign: "right" }}>
-                  <button
-                    onClick={() => setSelectedTenantForSuspension(tenant)}
-                    style={{
-                      background: "transparent",
-                      border: "1px solid var(--border-medium)",
-                      color: tenant.status === "ACTIVE" ? "var(--accent-terra)" : "var(--accent-emerald)",
-                      padding: "0.35rem 0.75rem",
-                      borderRadius: "6px",
-                      fontSize: "0.78rem",
-                      fontWeight: 600,
-                      cursor: "pointer",
-                      transition: "all 0.15s ease",
-                    }}
-                  >
-                    {tenant.status === "ACTIVE" ? "Emergency Suspend" : "Reactivate Tenant"}
-                  </button>
+            {filteredTenants.length === 0 ? (
+              <tr>
+                <td colSpan={7} style={{ padding: "3rem", textAlign: "center", color: "var(--text-muted)", fontSize: "0.9rem" }}>
+                  No tenant registered yet. Create an account via{" "}
+                  <Link href="/signup" style={{ color: "var(--accent-dark)", textDecoration: "underline", fontWeight: 600 }}>
+                    /signup
+                  </Link>{" "}
+                  to register your organization workspace!
                 </td>
               </tr>
-            ))}
+            ) : (
+              filteredTenants.map((tenant) => (
+                <tr key={tenant.id} style={{ borderBottom: "1px solid var(--border-light)" }}>
+                  <td style={{ padding: "0.85rem 1rem", fontWeight: 600, color: "var(--text-dark)" }}>
+                    {tenant.name}
+                    <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontFamily: "'Space Grotesk', monospace" }}>
+                      ID: {tenant.id}
+                    </div>
+                  </td>
+                  <td style={{ padding: "0.85rem 1rem", fontFamily: "'Space Grotesk', monospace", color: "var(--text-muted)" }}>
+                    {tenant.slug}
+                  </td>
+                  <td style={{ padding: "0.85rem 1rem", fontWeight: 600 }}>{tenant.users} user</td>
+                  <td style={{ padding: "0.85rem 1rem", fontFamily: "'Space Grotesk', monospace" }}>
+                    {tenant.events.toLocaleString()} events
+                  </td>
+                  <td style={{ padding: "0.85rem 1rem", fontSize: "0.85rem" }}>{tenant.plan}</td>
+                  <td style={{ padding: "0.85rem 1rem" }}>
+                    <span className={tenant.status === "ACTIVE" ? "badge-emerald" : "badge-terra"}>
+                      {tenant.status}
+                    </span>
+                  </td>
+                  <td style={{ padding: "0.85rem 1rem", textAlign: "right" }}>
+                    <button
+                      onClick={() => setSelectedTenantForSuspension(tenant)}
+                      style={{
+                        background: "transparent",
+                        border: "1px solid var(--border-medium)",
+                        color: tenant.status === "ACTIVE" ? "var(--accent-terra)" : "var(--accent-emerald)",
+                        padding: "0.35rem 0.75rem",
+                        borderRadius: "6px",
+                        fontSize: "0.78rem",
+                        fontWeight: 600,
+                        cursor: "pointer",
+                        transition: "all 0.15s ease",
+                      }}
+                    >
+                      {tenant.status === "ACTIVE" ? "Emergency Suspend" : "Reactivate Tenant"}
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

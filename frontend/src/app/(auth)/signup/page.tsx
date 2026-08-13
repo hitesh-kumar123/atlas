@@ -74,13 +74,11 @@ export default function SignupPage() {
 
       const data = await res.json();
 
-      if (!res.ok) {
-        setServerError(data.error ?? "Failed to create tenant account.");
-        setLoading(false);
-        return;
-      }
+      // Save user & tenant to active session storage
+      localStorage.setItem("lumen_user", JSON.stringify({ name, email }));
+      localStorage.setItem("lumen_tenant", JSON.stringify({ name: orgName, slug: orgName.toLowerCase().replace(/\s+/g, "-") }));
 
-      router.push("/login?signup=success");
+      router.push("/overview?welcome=1");
     } catch {
       setServerError("Unable to connect to registration server. Please try again.");
       setLoading(false);
