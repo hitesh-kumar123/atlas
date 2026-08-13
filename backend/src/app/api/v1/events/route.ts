@@ -4,6 +4,16 @@ import { globalRateLimiter } from "@/lib/rate-limiter";
 import { ingestBatchSchema } from "@/lib/validation";
 import { withTenant } from "@/lib/prisma";
 
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization, x-api-key, Idempotency-Key",
+};
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: corsHeaders });
+}
+
 export async function POST(req: Request) {
   const authHeader = req.headers.get("authorization");
   const xApiKeyHeader = req.headers.get("x-api-key");
@@ -18,7 +28,7 @@ export async function POST(req: Request) {
   if (!apiKey) {
     return NextResponse.json(
       { error: "Unauthorized: Missing API Key header" },
-      { status: 401 }
+      { status: 401, headers: corsHeaders }
     );
   }
 
@@ -26,7 +36,7 @@ export async function POST(req: Request) {
   if (!authResult) {
     return NextResponse.json(
       { error: "Unauthorized: Invalid or revoked API Key" },
-      { status: 401 }
+      { status: 401, headers: corsHeaders }
     );
   }
 
@@ -38,7 +48,7 @@ export async function POST(req: Request) {
   } catch {
     return NextResponse.json(
       { error: "Bad Request: Invalid JSON body" },
-      { status: 400 }
+      { status: 400, headers: corsHeaders }
     );
   }
 
@@ -49,7 +59,7 @@ export async function POST(req: Request) {
         error: "Unprocessable Entity: Validation failed",
         details: parseResult.error.issues,
       },
-      { status: 422 }
+      { status: 422, headers: corsHeaders }
     );
   }
 
@@ -66,6 +76,7 @@ export async function POST(req: Request) {
       {
         status: 429,
         headers: {
+          ...corsHeaders,
           "Retry-After": String(rateCheck.retryAfterSeconds ?? 1),
         },
       }
@@ -106,13 +117,13 @@ export async function POST(req: Request) {
         accepted: insertedCount,
         duplicatesSkipped: eventCount - insertedCount,
       },
-      { status: 202 }
+      { status: 202, headers: corsHeaders }
     );
   } catch (err) {
     console.error("Event ingest error:", err);
     return NextResponse.json(
       { error: "Internal Server Error: Ingestion failed" },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }

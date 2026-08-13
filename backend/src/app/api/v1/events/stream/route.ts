@@ -1,29 +1,39 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const encoder = new TextEncoder();
+  let interval: NodeJS.Timeout | null = null;
 
   const customStream = new ReadableStream({
     start(controller) {
       const sendEvent = () => {
-        const sampleEvents = ["page_view", "button_click", "search", "checkout_start", "checkout_complete"];
-        const randomName = sampleEvents[Math.floor(Math.random() * sampleEvents.length)]!;
-        const randomUser = `user_${Math.floor(Math.random() * 1000) + 1}`;
+        try {
+          if (req.signal.aborted) {
+            if (interval) clearInterval(interval);
+            return;
+          }
 
-        const data = JSON.stringify({
-          id: `evt_live_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-          name: randomName,
-          distinctId: randomUser,
-          properties: {
-            browser: "Chrome 128",
-            os: "macOS",
-            path: "/dashboard",
-            session_ms: Math.floor(Math.random() * 180000),
-          },
-          occurredAt: new Date().toISOString(),
-        });
+          const sampleEvents = ["page_view", "button_click", "search", "checkout_start", "checkout_complete"];
+          const randomName = sampleEvents[Math.floor(Math.random() * sampleEvents.length)]!;
+          const randomUser = `user_${Math.floor(Math.random() * 1000) + 1}`;
 
-        controller.enqueue(encoder.encode(`data: ${data}\n\n`));
+          const data = JSON.stringify({
+            id: `evt_live_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+            name: randomName,
+            distinctId: randomUser,
+            properties: {
+              browser: "Chrome 128",
+              os: "macOS",
+              path: "/dashboard",
+              session_ms: Math.floor(Math.random() * 180000),
+            },
+            occurredAt: new Date().toISOString(),
+          });
+
+          controller.enqueue(encoder.encode(`data: ${data}\n\n`));
+        } catch {
+          if (interval) clearInterval(interval);
+        }
       };
 
       // Send initial batch of 3 events
@@ -32,13 +42,16 @@ export async function GET() {
       sendEvent();
 
       // Stream new event every 2 seconds
-      const interval = setInterval(() => {
+      interval = setInterval(() => {
         sendEvent();
       }, 2000);
 
-      return () => {
-        clearInterval(interval);
-      };
+      req.signal.addEventListener("abort", () => {
+        if (interval) clearInterval(interval);
+      });
+    },
+    cancel() {
+      if (interval) clearInterval(interval);
     },
   });
 
