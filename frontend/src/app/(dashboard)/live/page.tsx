@@ -18,7 +18,8 @@ export default function LiveFeedPage() {
   useEffect(() => {
     if (!isLiveStreamActive) return;
 
-    const eventSource = new EventSource("http://localhost:4000/api/v1/events/stream");
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:4000";
+    const eventSource = new EventSource(`${backendUrl}/api/v1/events/stream`);
 
     eventSource.onmessage = (event) => {
       try {

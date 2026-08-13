@@ -1,6 +1,6 @@
 # ATLAS: Multi-Tenant Product Analytics Platform
 
-ATLAS is a high-performance, multi-tenant product analytics platform built with **Next.js 15 (App Router)**, **TypeScript (Strict Mode)**, **Postgres**, **Prisma ORM**, and **Auth.js v5**. 
+ATLAS is a high-performance, multi-tenant product analytics platform built with **Next.js 15 (App Router)**, **TypeScript (Strict Mode)**, **Postgres**, **Prisma ORM**, and **Auth.js v5**.
 
 It is designed around database-enforced multi-tenancy, sub-300ms analytical query performance over millions of events, streaming real-time metrics, and an internal operational management console.
 
@@ -51,6 +51,7 @@ ATLAS consists of three integrated surfaces built on a modular monorepo setup:
 Follow these steps to set up and run ATLAS on your local machine.
 
 ### 1. Prerequisites
+
 - **Node.js**: v18.x or v20.x+
 - **npm**: v9.x or v10.x+
 - **Postgres Database**: Local PostgreSQL instance or Docker container (v14+ recommended)
@@ -58,6 +59,7 @@ Follow these steps to set up and run ATLAS on your local machine.
 ### 2. Environment Configuration
 
 Create `.env` in `backend/`:
+
 ```env
 # Full connection string for migrations & seed (DB Owner Role)
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/atlas?schema=public"
@@ -71,6 +73,7 @@ NEXTAUTH_URL="http://localhost:4000"
 ```
 
 Create `.env` in `frontend/`:
+
 ```env
 NEXT_PUBLIC_API_URL="http://localhost:4000"
 ```
@@ -78,6 +81,7 @@ NEXT_PUBLIC_API_URL="http://localhost:4000"
 ### 3. Database Initialization & Migrations
 
 Navigate to the `backend` directory and run Prisma migrations:
+
 ```bash
 cd backend
 npm install
@@ -94,6 +98,7 @@ npm run seed
 ```
 
 > **Note**: Seed credentials generated:
+>
 > - **Acme Corp Owner**: `admin@acme-corp.com` / `password123!`
 > - **Globex Inc Owner**: `admin@globex-inc.com` / `password123!`
 > - **Initech LLC Owner**: `admin@initech-llc.com` / `password123!`
@@ -101,12 +106,14 @@ npm run seed
 ### 5. Running the Backend & Frontend Servers
 
 Start the backend API & Auth server (Port 4000):
+
 ```bash
 # In backend/
 npm run dev
 ```
 
 In a new terminal window, start the frontend dashboard server (Port 3000):
+
 ```bash
 cd frontend
 npm install
@@ -114,6 +121,7 @@ npm run dev
 ```
 
 Access the applications:
+
 - **Tenant Dashboard**: [http://localhost:3000](http://localhost:3000)
 - **Backend API & Auth**: [http://localhost:4000](http://localhost:4000)
 
@@ -124,12 +132,14 @@ Access the applications:
 ATLAS includes unit, security isolation, and integration test suites powered by **Vitest**.
 
 Run all backend tests:
+
 ```bash
 cd backend
 npm test
 ```
 
 ### Test Suite Summary
+
 - `tests/rls-isolation.test.ts`: Verifies Postgres RLS security policies. Ensures `SELECT * FROM events` without a `WHERE` clause returns **0 foreign tenant rows** when running under a tenant-scoped connection.
 - `tests/ingest.test.ts`: Tests `POST /api/v1/events` single/batch ingestion, Argon2 key authentication, 24-hour idempotency key deduplication, and rate limiting headers.
 - `tests/funnel-math.test.ts`: Validates 2-6 step funnel conversion and drop-off math against hand-computed fixtures.
@@ -141,13 +151,15 @@ npm test
 ### Ingest Endpoint: `POST /api/v1/events`
 
 #### Headers
-| Header | Type | Required | Description |
-|---|---|---|---|
-| `Authorization` | String | Yes | `Bearer <API_KEY>` issued for tenant |
-| `Content-Type` | String | Yes | `application/json` |
+
+| Header            | Type   | Required | Description                                        |
+| ----------------- | ------ | -------- | -------------------------------------------------- |
+| `Authorization`   | String | Yes      | `Bearer <API_KEY>` issued for tenant               |
+| `Content-Type`    | String | Yes      | `application/json`                                 |
 | `Idempotency-Key` | String | Optional | Unique key per event payload for 24h deduplication |
 
 #### Single Event Request Payload
+
 ```json
 {
   "name": "checkout_complete",
@@ -162,6 +174,7 @@ npm test
 ```
 
 #### Batch Request Payload (Up to 500 events)
+
 ```json
 [
   {
@@ -178,6 +191,7 @@ npm test
 ```
 
 #### Response Codes
+
 - `202 Accepted`: Payload successfully queued / inserted.
 - `401 Unauthorized`: Missing or invalid API key.
 - `403 Forbidden`: Tenant suspended by admin.
@@ -204,3 +218,10 @@ Key architectural choices are documented in `backend/docs/decisions/`:
 - **Database & ORM**: PostgreSQL, Prisma ORM, Native Postgres RLS Policies, JSONB GIN Indexes
 - **Security**: Argon2 Password & API Key Hashing, Zod Validation Schemas, RLS Row Isolation
 - **Testing**: Vitest for Unit & Integration Testing
+
+<!-- Dont toch  -->
+
+Lumen@123_atlas = database password supbase
+
+supabase Coonect project string =
+postgresql://postgres:[Lumen@123_atlas]@db.dftilyyrftkdfbhrpzsu.supabase.co:5432/postgres
