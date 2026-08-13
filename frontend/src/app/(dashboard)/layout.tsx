@@ -223,6 +223,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { label: "Retention", href: "/retention" },
     { label: "Live Feed", href: "/live", badge: "LIVE" },
     { label: "API Keys", href: "/settings/keys" },
+    { label: "Ops Console", href: "/ops", badge: "OPS" },
   ];
 
   return (
