@@ -75,6 +75,12 @@ export default function SignupPage() {
 
       const data = await res.json();
 
+      if (!res.ok) {
+        setServerError(data.error || "Registration failed. Please try again.");
+        setLoading(false);
+        return;
+      }
+
       // Save user & tenant to active session storage
       localStorage.setItem("lumen_user", JSON.stringify({ name, email }));
       localStorage.setItem("lumen_tenant", JSON.stringify({ name: orgName, slug: orgName.toLowerCase().replace(/\s+/g, "-") }));

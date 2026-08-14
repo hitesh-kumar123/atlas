@@ -59,6 +59,12 @@ export default function LoginPage() {
 
       const data = await res.json();
 
+      if (!res.ok) {
+        setServerError(data.error || "Invalid credentials. Please try again.");
+        setLoading(false);
+        return;
+      }
+
       const existingUser = localStorage.getItem("lumen_user");
       if (!existingUser) {
         const derivedName = email.split("@")[0].replace(/[._-]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
